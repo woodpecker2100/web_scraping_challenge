@@ -1,20 +1,15 @@
-
-from splinter import Browser
 from bs4 import BeautifulSoup
+import requests
+from splinter import Browser
 from webdriver_manager.chrome import ChromeDriverManager
-
 import pandas as pd
 
-import requests
-
 def init_browser():
-    # Setting up windows browser with chromedriver
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=False)
     return browser
 
 def scrape():
-    
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=False)
 
@@ -25,20 +20,19 @@ def scrape():
         soup = BeautifulSoup(html, "html.parser")
         return soup
 
-    # Get latest news headline and blurb
-    listings = {}
-
+    #Collecting Headlines as per the mission-to-mars.ipynb
+    headlines = {}
     url = "https://redplanetscience.com"
 
     soup = scrape1(url)
     try:
-        listings["headline"] = soup.find("div", class_="content_title").get_text().strip()
-        listings["text"] = soup.find("div", class_="article_teaser_body").get_text().strip()
+        headlines["headline"] = soup.find("div", class_="content_title").get_text().strip()
+        headlines["text"] = soup.find("div", class_="article_teaser_body").get_text().strip()
     except Exception as e:
         print(e)
     
 
-    # Get featured Mars image
+    #Collecting the featured Mars image as per the mission-to-mars.ipynb
     url = "https://spaceimages-mars.com/"
     soup = scrape1(url)
     try:
@@ -47,7 +41,7 @@ def scrape():
     except Exception as e:
         print(e)
 
-    # Galaxy facts tables
+    #Collecting the Galaxy facts as per the mission-to-mars.ipynb
     url = "https://galaxyfacts-mars.com/"
     tables = pd.read_html(url)
 
@@ -58,7 +52,7 @@ def scrape():
     df = df.set_index('')
     htmltable = (df.to_html()).replace('\n', '')
 
-    # Hemisphere high res images
+    #Collecting the high res images from the hemisphere website as per the mission-to-mars.ipynb
     url = "https://marshemispheres.com/"
     hemispheres = []
 
@@ -73,19 +67,18 @@ def scrape():
         img_url = item.find('a')['href']
         hemi['title'] = (item.find('h3').get_text().strip())
     
-        newurl = url + img_url
-        soup = scrape1(newurl)
+        new_url = url + img_url
+        soup = scrape1(new_url)
     
         n = soup.find_all('li')[0]
         hemi['img_url'] = (url + n.find('a')['href'])
         hemispheres.append(hemi)
 
-    # quit browser
     browser.quit()
 
-    # Return dict
-    ans = {"headline": listings['headline'],
-        "text": listings['text'],
+    # Return definition as ans
+    ans = {"headline": headlines['headline'],
+        "text": headlines['text'],
         "featured_image": featured_image_url,
         "facts_table": htmltable,
         "hemisphere_images": hemispheres}
