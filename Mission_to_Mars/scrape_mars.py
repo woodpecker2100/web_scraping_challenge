@@ -1,17 +1,18 @@
 from bs4 import BeautifulSoup
-import requests
+# import requests
 from splinter import Browser
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 
+
 def init_browser():
     executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path, headless=False)
+    browser = Browser('chrome', **executable_path, headless=True)
     return browser
 
 def scrape():
     executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path, headless=False)
+    browser = Browser('chrome', **executable_path, headless=True)
 
     # Avoid repeating code and launching broswer multiple times 
     def scrape1(url_str):
@@ -86,4 +87,5 @@ def scrape():
     return ans
 
 if __name__ == "__main__":
+    #init_browser()
     scrape()
